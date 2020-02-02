@@ -29,11 +29,11 @@ pipeline {
 			}
 		}
 
-		stage("Checking code quality") {
+		/*stage("Checking code quality") {
 			steps {
 				build 'maven-hello-world-checkstyle'
 			}
-		}
+		}*/
 
 		stage("Deploy to production") {
 			steps {
