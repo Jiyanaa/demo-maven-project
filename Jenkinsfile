@@ -17,39 +17,56 @@ pipeline {
 					archiveArtifacts '**/*.war'
 				}
 				failure {
-					echo "Something went wrong..."
+					echo "failed to generate artifact.."
 				}
 
 			}
 		}
 
-		stage("Deploy to staging") {
-			steps {
-				build 'maven-hello-world-deploy-to-staging'
-			}
-		}
+		stage("Deploy to staging and checking code quality") {
+			parallel {
 
-		/*stage("Checking code quality") {
-			steps {
-				build 'maven-hello-world-checkstyle'
-			}
-		}*/
+				stage("Deploy to staging") {
+					steps {
+						deploy adapters: [tomcat9(credentialsId: 'd1c23a65-3451-4b6b-acf0-b311d0fa51f2', path: '', url: 'http://localhost:8086')], contextPath: null, war: '**/*.war'
+					}
+				}
+				post {
+					success {
+						echo "an application is deployed to staging environment successfully."
 
-		stage("Deploy to production") {
-			steps {
-				timeout(time: 5, unit: 'HOURS') {
-    				input 'Deploy an application to production'
+					}
+					failure {
+						 eacho "failed to deploy an application to staging environment."
+					}
 				}
-				build 'maven-hello-world-deploy-to-production'
+
+				stage("Checking code quality") {
+					steps {
+						bat label: '', script: 'mvn checkstyle:checkstyle'
+						checkstyle canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '', unHealthy: ''
+					}
+				}
+
+				stage("Deploy to production") {
+					steps {
+						timeout(time: 5, unit: 'HOURS') {
+   						 	input 'Do You want to deploy an application to production?'
+						}
+
+						deploy adapters: [tomcat9(credentialsId: 'd1c23a65-3451-4b6b-acf0-b311d0fa51f2', path: '', url: 'http://localhost:8087')], contextPath: null, onFailure: false, war: '**/*.war'
+					}
+
+					post {
+						success {
+							echo "An application is deployed to production environment successfully."
+						}
+						failure {
+							echo "Failed to deploy application to production environment."
+						}
+					}
+				}
 			}
-			post {
-				success {
-					echo "an application is deploy to production successfully."
-				}
-				failure {
-					echo "an application is failed to deploy."
-				}
-			}
-		}
+		}	
 	}
 }
