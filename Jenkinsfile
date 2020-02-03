@@ -47,9 +47,10 @@ pipeline {
 						checkstyle canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '', unHealthy: ''
 					}
 				}
-			}
+			}	
+		}
 
-			stage("Deploy to production") {
+		stage("Deploy to production") {
 					steps {
 						timeout(time: 5, unit: 'HOURS') {
    						 	input 'Do You want to deploy an application to production?'
@@ -66,7 +67,6 @@ pipeline {
 							echo "Failed to deploy application to production environment."
 						}
 					}
-				}
-		}	
+				}	
 	}
 }
