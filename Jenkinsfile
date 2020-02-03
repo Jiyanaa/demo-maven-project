@@ -6,7 +6,7 @@ pipeline {
 	}
 
 	stages {
-		stage("Package") {
+		stage("Package application") {
 			steps {
 				bat label: '', script: 'mvn clean package'
 			}
