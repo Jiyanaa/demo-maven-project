@@ -30,17 +30,16 @@ pipeline {
 					steps {
 						deploy adapters: [tomcat9(credentialsId: 'd1c23a65-3451-4b6b-acf0-b311d0fa51f2', path: '', url: 'http://localhost:8086')], contextPath: null, war: '**/*.war'
 					}
-				}
-				post {
-					success {
-						echo "an application is deployed to staging environment successfully."
-
+					post {
+						success {
+							echo "an application is deployed to staging environment successfully."
+						}
+						failure {
+						 	echo "failed to deploy an application to staging environment."
+						}
 					}
-					failure {
-						 eacho "failed to deploy an application to staging environment."
-					}
 				}
-
+				
 				stage("Checking code quality") {
 					steps {
 						bat label: '', script: 'mvn checkstyle:checkstyle'
